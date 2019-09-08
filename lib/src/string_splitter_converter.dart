@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
-import './helpers/code_units.dart' as CodeUnits;
+import './helpers/code_units.dart' as code_units;
 
 /// A converter for splitting strings and returning the parts in a list.
 class StringSplitterConverter extends Converter<String, List<String>> {
@@ -10,8 +10,8 @@ class StringSplitterConverter extends Converter<String, List<String>> {
     this.removeSplitters,
     this.trimParts, [
     this.chunkCount,
-  ])  : assert(splitters != null && splitters.length > 0),
-        assert(delimiters == null || delimiters.length > 0),
+  ])  : assert(splitters != null),
+        assert(delimiters == null),
         assert(removeSplitters != null),
         assert(trimParts != null),
         assert(chunkCount == null || chunkCount > 0);
@@ -85,8 +85,8 @@ class _StringSplitterSink extends ChunkedConversionSink<String> {
     this.removeSplitters,
     this.trimParts,
     this.chunkCount,
-  )   : assert(splitters != null && splitters.length > 0),
-        assert(delimiters == null || delimiters.length > 0),
+  )   : assert(splitters != null),
+        assert(delimiters == null),
         assert(removeSplitters != null),
         assert(trimParts != null),
         assert(chunkCount == null || chunkCount > 0);
@@ -202,8 +202,8 @@ class _StringSplitter {
 
     final List<String> stringParts = List<String>();
 
-    final List<List<int>> splitterCodeUnits = CodeUnits.splitters(splitters);
-    final List<dynamic> delimiterCodeUnits = CodeUnits.delimiters(delimiters);
+    final List<List<int>> splitterCodeUnits = code_units.splitters(splitters);
+    final List<dynamic> delimiterCodeUnits = code_units.delimiters(delimiters);
 
     bool delimited = false;
 
@@ -220,7 +220,7 @@ class _StringSplitter {
           final int sliceEnd = i + delimiter.length;
 
           if (sliceEnd < string.length &&
-              CodeUnits.match(
+              code_units.match(
                 delimiter,
                 string.substring(i, sliceEnd).codeUnits,
               )) {
@@ -240,7 +240,7 @@ class _StringSplitter {
 
         // If a splitter was found, capture the current slice.
         if (sliceEnd < string.length &&
-            CodeUnits.match(
+            code_units.match(
               splitter,
               string.substring(i, sliceEnd).codeUnits,
             )) {
