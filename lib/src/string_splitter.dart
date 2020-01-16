@@ -53,10 +53,10 @@ class StringSplitter {
     assert(trimParts != null);
 
     return StringSplitterConverter(
-      splitters,
-      delimiters,
-      removeSplitters,
-      trimParts,
+      splitters: splitters,
+      delimiters: delimiters,
+      removeSplitters: removeSplitters,
+      trimParts: trimParts,
     ).convert(string);
   }
 
@@ -102,17 +102,17 @@ class StringSplitter {
     assert(trimParts != null);
     assert(chunkSize != null && chunkSize > 0);
 
-    final List<String> chunks = chunk(string, chunkSize);
+    final chunks = chunk(string, chunkSize);
 
-    final Stream<String> input = Stream.fromIterable(chunks);
+    final input = Stream.fromIterable(chunks);
 
     return input.transform(
       StringSplitterConverter(
-        splitters,
-        delimiters,
-        removeSplitters,
-        trimParts,
-        chunks.length,
+        splitters: splitters,
+        delimiters: delimiters,
+        removeSplitters: removeSplitters,
+        trimParts: trimParts,
+        chunkCount: chunks.length,
       ),
     );
   }
@@ -126,13 +126,13 @@ class StringSplitter {
     assert(string != null);
     assert(chunkSize != null && chunkSize > 0);
 
-    final int chunkCount = (string.length / chunkSize).ceil();
+    final chunkCount = (string.length / chunkSize).ceil();
 
-    final List<String> chunks = List<String>(chunkCount);
+    final chunks = List<String>(chunkCount);
 
-    for (int i = 0; i < chunkCount; i++) {
-      final int sliceStart = i * chunkSize;
-      final int sliceEnd = sliceStart + chunkSize;
+    for (var i = 0; i < chunkCount; i++) {
+      final sliceStart = i * chunkSize;
+      final sliceEnd = sliceStart + chunkSize;
       chunks[i] = string.substring(
         sliceStart,
         (sliceEnd < string.length) ? sliceEnd : string.length,

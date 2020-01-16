@@ -4,9 +4,9 @@ import 'package:string_splitter/string_splitter_io.dart';
 
 void main() {
   test('Simple Split', () {
-    final String string = "1/ 2/ 3/ 4/ 5/ \"6/ 7/ 8\"/ 9/ 10";
+    final string = "1/ 2/ 3/ 4/ 5/ \"6/ 7/ 8\"/ 9/ 10";
 
-    final List<String> stringParts = StringSplitter.split(
+    final stringParts = StringSplitter.split(
        string,
        splitters: ['/'],
        delimiters: ['"'],
@@ -21,16 +21,16 @@ void main() {
   // The tests below use modified version of timezonedb.com's database files.
 
   test('String Streaming', () async {
-    final String testString = File('test/files/timezone.csv').readAsStringSync();
+    final testString = File('test/files/timezone.csv').readAsStringSync();
 
-    final Stream<List<String>> stream = StringSplitter.stream(
+    final stream = StringSplitter.stream(
       testString,
       splitters: ['/'],
       delimiters: ['"'],
       chunkSize: 5000,
     );
 
-    int partsCount = 0;
+    var partsCount = 0;
 
     await for (List<String> chunk in stream) {
       partsCount += chunk.length;
@@ -40,7 +40,7 @@ void main() {
   });
 
   test('Parse From File', () async {
-    final List<String> country = await StringSplitterIo.split(
+    final country = await StringSplitterIo.split(
       File('test/files/country.csv'),
       splitters: [',', '\n'],
       delimiters: ['"'],
@@ -48,12 +48,12 @@ void main() {
 
     expect(country.length, equals(498));
 
-    country.forEach((String part) {
+    for (var part in country) {
       expect(part.startsWith('"'), equals(true));
       expect(part.endsWith('"'), equals(true));
-    });
+    }
 
-    final List<String> zone = StringSplitterIo.splitSync(
+    final zone = StringSplitterIo.splitSync(
       File('test/files/zone.csv'),
       splitters: ['/', '\n'],
       delimiters: ['"', ['<', '>']],
@@ -62,7 +62,7 @@ void main() {
 
     expect(zone.length, equals(1275));
 
-    for (int i = 0; i < zone.length; i++) {
+    for (var i = 0; i < zone.length; i++) {
       switch (i % 3) {
         case 0:
           expect(zone[i].contains(RegExp(r'[0-9]{0,3}')), equals(true));
@@ -83,13 +83,13 @@ void main() {
   });
 
   test('Stream From File', () async {
-    final Stream<List<String>> timezone = StringSplitterIo.stream(
+    final timezone = StringSplitterIo.stream(
       File('test/files/timezone.csv'),
       splitters: ['/'],
       delimiters: ['"'],
     );
 
-    int partsCount = 0;
+    var partsCount = 0;
 
     await for (List<String> chunk in timezone) {
       partsCount += chunk.length;

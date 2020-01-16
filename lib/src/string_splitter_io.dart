@@ -59,13 +59,13 @@ class StringSplitterIo {
     assert(removeSplitters != null);
     assert(trimParts != null);
 
-    final String string = await file.readAsString(encoding: encoding);
+    final string = await file.readAsString(encoding: encoding);
 
     return StringSplitterConverter(
-      splitters,
-      delimiters,
-      removeSplitters,
-      trimParts,
+      splitters: splitters,
+      delimiters: delimiters,
+      removeSplitters: removeSplitters,
+      trimParts: trimParts,
     ).convert(string);
   }
 
@@ -119,13 +119,13 @@ class StringSplitterIo {
     assert(removeSplitters != null);
     assert(trimParts != null);
 
-    final String string = file.readAsStringSync(encoding: encoding);
+    final string = file.readAsStringSync(encoding: encoding);
 
     return StringSplitterConverter(
-      splitters,
-      delimiters,
-      removeSplitters,
-      trimParts,
+      splitters: splitters,
+      delimiters: delimiters,
+      removeSplitters: removeSplitters,
+      trimParts: trimParts,
     ).convert(string);
   }
 
@@ -176,14 +176,14 @@ class StringSplitterIo {
     assert(removeSplitters != null);
     assert(trimParts != null);
 
-    final Stream<List<int>> input = file.openRead();
+    final input = file.openRead();
 
     return input.transform(decoder ?? utf8.decoder).transform(
           StringSplitterConverter(
-            splitters,
-            delimiters,
-            removeSplitters,
-            trimParts,
+            splitters: splitters,
+            delimiters: delimiters,
+            removeSplitters: removeSplitters,
+            trimParts: trimParts,
           ),
         );
   }
