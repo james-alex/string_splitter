@@ -42,13 +42,14 @@ void main() {
   test('Parse From File', () async {
     final country = await StringSplitterIo.split(
       File('test/files/country.csv'),
-      splitters: [',', '\n'],
+      splitters: [',', '\r\n', '\n'],
       delimiters: ['"'],
     );
 
     expect(country.length, equals(498));
 
     for (var part in country) {
+      //print('$part: ${part[part.length - 1]}');
       expect(part.startsWith('"'), equals(true));
       expect(part.endsWith('"'), equals(true));
     }

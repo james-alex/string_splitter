@@ -9,6 +9,13 @@ class StringSplitter {
   /// of any of the [splitters]. [string] must not be `null`, [splitters]
   /// must not be `null` or empty.
   ///
+  /// __Note:__ If using a linebreak (`\n`) as a splitter, it's a good idea to
+  /// include `\r\n` before `\n`, as Windows and various internet protocols
+  /// will automatically replace linebreaks with `\r\n` for backwards
+  /// compatibility with legacy platforms. Not doing so shouldn't cause any
+  /// problems in most use cases, but will leave strings with a hidden `\r`
+  /// character. `\n\r` is also used as a line ending by some systems.
+  ///
   /// To exclude splitters from slicing, [delimiters] can be provided.
   /// [delimiters] can be provided as a [String], in which case, that
   /// [String] will be used as both the opening and closing delimiter.
@@ -66,6 +73,13 @@ class StringSplitter {
   /// Splits [string] into parts, slicing the string at each occurrence
   /// of any of the [splitters]. [string] must not be `null`,
   /// [splitters] must not be `null` or empty.
+  ///
+  /// __Note:__ If using a linebreak (`\n`) as a splitter, it's a good idea to
+  /// include `\r\n` before `\n`, as Windows and various internet protocols
+  /// will automatically replace linebreaks with `\r\n` for backwards
+  /// compatibility with legacy platforms. Not doing so shouldn't cause any
+  /// problems in most use cases, but will leave strings with a hidden `\r`
+  /// character. `\n\r` is also used as a line ending by some systems.
   ///
   /// To exclude splitters from slicing, [delimiters] can be provided.
   /// [delimiters] can be provided as a [String], in which case, that

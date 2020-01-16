@@ -13,7 +13,7 @@ class StringSplitterConverter extends Converter<String, List<String>> {
     @required this.trimParts,
     this.chunkCount,
   })  : assert(splitters != null),
-        assert(delimiters == null),
+        assert(delimiters != null),
         assert(removeSplitters != null),
         assert(trimParts != null),
         assert(chunkCount == null || chunkCount > 0);
@@ -108,7 +108,7 @@ class _StringSplitterSink extends ChunkedConversionSink<String> {
     @required this.trimParts,
     this.chunkCount,
   })  : assert(splitters != null),
-        assert(delimiters == null),
+        assert(delimiters != null),
         assert(removeSplitters != null),
         assert(trimParts != null),
         assert(chunkCount == null || chunkCount > 0);
@@ -260,7 +260,7 @@ class _StringSplitter {
 
       // Check for splitters.
       for (var splitter in splitterCodeUnits) {
-        final sliceEnd = i + splitter.length;
+        var sliceEnd = i + splitter.length;
 
         // If a splitter was found, capture the current slice.
         if (sliceEnd < string.length &&
@@ -268,13 +268,13 @@ class _StringSplitter {
               splitter,
               string.substring(i, sliceEnd).codeUnits,
             )) {
-          var sliceEnd = (removeSplitters) ? i : i + splitter.length;
 
+          if (removeSplitters) sliceEnd = i;
           var stringPart = string.substring(sliceStart, sliceEnd);
           if (trimParts) stringPart = stringPart.trim();
           stringParts.add(stringPart);
 
-          sliceStart = (removeSplitters) ? i + splitter.length : sliceEnd;
+          sliceStart = removeSplitters ? i + splitter.length : sliceEnd;
           i = sliceStart - 1;
 
           break;
