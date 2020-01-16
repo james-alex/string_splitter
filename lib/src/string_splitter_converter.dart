@@ -268,7 +268,6 @@ class _StringSplitter {
               splitter,
               string.substring(i, sliceEnd).codeUnits,
             )) {
-
           if (removeSplitters) sliceEnd = i;
           var stringPart = string.substring(sliceStart, sliceEnd);
           if (trimParts) stringPart = stringPart.trim();
