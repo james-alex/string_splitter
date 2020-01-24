@@ -1,5 +1,8 @@
 # string_splitter
 
+[![pub package](https://img.shields.io/pub/v/string_splitter.svg)](https://pub.dartlang.org/packages/string_splitter)
+[![style: effective dart](https://img.shields.io/badge/style-effective_dart-40c4ff.svg)](https://github.com/tenhobi/effective_dart)
+
 Utility classes for splitting strings and files into parts. Supports
 streamed parsing for handling long strings and large files.
 
