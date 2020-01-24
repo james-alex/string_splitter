@@ -2,7 +2,7 @@ name: string_splitter
 description: >-
   Utility classes for splitting strings and files into parts. Supports
   streamed parsing for handling long strings and large files.
-version: 0.1.0+3
+version: 0.1.0+4
 homepage: https://github.com/james-alex/string_splitter
 
 environment:
