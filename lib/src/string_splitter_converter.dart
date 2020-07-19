@@ -211,11 +211,11 @@ class _StringSplitter {
   /// any remaining text will be appended to the parts.
   static _StringSplitter split(
     String string, {
-    List<String> splitters,
-    List<dynamic> delimiters,
-    bool removeSplitters,
-    bool trimParts,
-    bool carryOver,
+    @required List<String> splitters,
+    @required List<dynamic> delimiters,
+    @required bool removeSplitters,
+    @required bool trimParts,
+    @required bool carryOver,
   }) {
     assert(string != null);
     assert(splitters != null && splitters.isNotEmpty);
