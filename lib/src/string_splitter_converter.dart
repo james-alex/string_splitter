@@ -267,7 +267,7 @@ class Delimiter {
   /// {@macro string_splitter.Delimiter}
   const Delimiter(this.opening, [String closing])
       : assert(opening != null),
-        _closting = closing;
+        _closing = closing;
 
   final String opening;
 
