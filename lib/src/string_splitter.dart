@@ -133,3 +133,64 @@ class StringSplitter {
     return chunks;
   }
 }
+
+extension StringSplitterExtension on String {
+  /// {@macro string_splitter.StringSplitter.split}
+  ///
+  /// {@macro string_splitter.StringSplitter.split.parameters}
+  List<String> split({
+    @required List<String> splitters,
+    List<Object> delimiters,
+    bool removeSplitters = true,
+    bool trimParts = false,
+  }) {
+    assert(splitters != null && splitters.isNotEmpty);
+    assert(delimiters == null ||
+        delimiters.every(
+            (delimiter) => delimiter is String || delimiter is Delimiter));
+    assert(removeSplitters != null);
+    assert(trimParts != null);
+    return StringSplitter.split(
+      this,
+      splitters: splitters,
+      delimiters: delimiters,
+      removeSplitters: removeSplitters,
+      trimParts: trimParts,
+    );
+  }
+
+  /// {@macro string_splitter.StringSplitter.stream}
+  ///
+  /// {@macro string_splitter.StringSplitter.split.parameters}
+  ///
+  /// {@macro string_splitter.StringSplitter.stream.parameters}
+  Stream<List<String>> splitStream({
+    @required List<String> splitters,
+    List<Object> delimiters,
+    bool removeSplitters = true,
+    bool trimParts = false,
+    @required int chunkSize,
+  }) {
+    assert(splitters != null && splitters.isNotEmpty);
+    assert(delimiters == null ||
+        delimiters.every(
+            (delimiter) => delimiter is String || delimiter is Delimiter));
+    assert(removeSplitters != null);
+    assert(trimParts != null);
+    assert(chunkSize != null && chunkSize > 0);
+    return StringSplitter.stream(
+      this,
+      splitters: splitters,
+      delimiters: delimiters,
+      removeSplitters: removeSplitters,
+      trimParts: trimParts,
+      chunkSize: chunkSize,
+    );
+  }
+
+  /// {@macro string_splitter.StringSplitter.chunk}
+  List<String> chunk(int chunkSize) {
+    assert(chunkSize != null && chunkSize > 0);
+    return StringSplitter.chunk(this, chunkSize);
+  }
+}
