@@ -265,6 +265,13 @@ class _StringSplitter {
 /// {@endtemplate}
 class Delimiter {
   /// {@macro string_splitter.Delimiter}
-  const Delimiter(this.opening, [this.closing]);
-  final String opening, closing;
+  const Delimiter(this.opening, [String closing])
+      : assert(opening != null),
+        _closting = closing;
+
+  final String opening;
+
+  final String _closing;
+
+  String get closing => _closing ?? opening;
 }
