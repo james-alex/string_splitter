@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:collection/collection.dart';
-import 'string_splitter.dart';
-import 'string_splitter_io.dart';
 
 /// A [Converter] for splitting strings and returning the parts in a list.
 class StringSplitterConverter extends Converter<String, List<String>> {
