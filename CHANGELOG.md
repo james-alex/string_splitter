@@ -1,4 +1,8 @@
-## [0.2.0] - March 25, 2021
+## [1.0.0] - March 26, 2021
+
+* Migrated to null-safe code.
+
+## [0.2.0] - March 26, 2021
 
 * Added the [Delimiter] class; the [delimiters] parameters now acccept lists
 of [String]s and [Delimiter]s, instead of [String]s and `List<String>`s.
