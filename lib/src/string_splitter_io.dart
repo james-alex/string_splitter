@@ -9,45 +9,15 @@ export 'dart:io' show File;
 class StringSplitterIo {
   StringSplitterIo._();
 
+  /// {@template string_splitter_io.StringSplitterIo.split}
+  ///
   /// Reads [file] as a string and splits it into parts, slicing the string
   /// at each occurrence of any of the [splitters]. [file] must not
   /// be `null`, [splitters] must not be `null` or empty.
   ///
-  /// __Note:__ If using a linebreak (`\n`) as a splitter, it's a good idea to
-  /// include `\r\n` before `\n`, as Windows and various internet protocols
-  /// will automatically replace linebreaks with `\r\n` for backwards
-  /// compatibility with legacy platforms. Not doing so shouldn't cause any
-  /// problems in most use cases, but will leave strings with a hidden `\r`
-  /// character. `\n\r` is also used as a line ending by some systems.
+  /// {@endtemplate}
   ///
-  /// To exclude splitters from slicing, [delimiters] can be provided.
-  /// [delimiters] can be provided as a [String], in which case, that
-  /// [String] will be used as both the opening and closing delimiter.
-  /// Or, as a [List<String>] with 2 children, the first child being the
-  /// opening delimiter, and the second child being the closing delimiter.
-  /// [delimiters] must not be empty if it is provided.
-  ///
-  /// If [removeSplitters] is `true`, each string part will be captured
-  /// without the splitting character(s), if `false`, the splitter will
-  /// be included with the part. [removeSplitters] must not be `null`.
-  ///
-  /// If [trimParts] is `true`, the parser will trim the whitespace around
-  /// each part when they are captured. [trimParts] must not be `null`.
-  ///
-  /// ```dart
-  ///   final String string = "1/ 2/ 3/ 4/ 5/ <6/ 7/ 8>/ 9/ 10";
-  ///
-  ///   final List<String> stringParts = StringSplitter.split(
-  ///     string,
-  ///     ['/'],
-  ///     delimiters: [['<', '>']],
-  ///     trimParts: true,
-  ///   );
-  ///
-  ///   print(stringParts); // [1, 2, 3, 4, 5, <6/ 7/ 8>, 9, 10]
-  /// ```
-  ///
-  /// [encoding] is the codec used to read the file.
+  /// {@macro string_splitter.StringSplitter.split.parameters}
   static Future<List<String>> split(
     File file, {
     @required List<String> splitters,
@@ -76,45 +46,15 @@ class StringSplitterIo {
     ).convert(string);
   }
 
+  /// {@template string_splitter_io.StringSplitterIo.splitSync}
+  ///
   /// Synchronously reads [file] as a string and splits it into parts,
   /// slicing the string at each occurrence of any of the [splitters].
   /// [file] not be `null`, [splitters] must not be `null` or empty.
   ///
-  /// __Note:__ If using a linebreak (`\n`) as a splitter, it's a good idea to
-  /// include `\r\n` before `\n`, as Windows and various internet protocols
-  /// will automatically replace linebreaks with `\r\n` for backwards
-  /// compatibility with legacy platforms. Not doing so shouldn't cause any
-  /// problems in most use cases, but will leave strings with a hidden `\r`
-  /// character. `\n\r` is also used as a line ending by some systems.
+  /// {@endtemplate}
   ///
-  /// To exclude splitters from slicing, [delimiters] can be provided.
-  /// [delimiters] can be provided as a [String], in which case, that
-  /// [String] will be used as both the opening and closing delimiter.
-  /// Or, as a [List<String>] with 2 children, the first child being the
-  /// opening delimiter, and the second child being the closing delimiter.
-  /// [delimiters] must not be empty if it is provided.
-  ///
-  /// If [removeSplitters] is `true`, each string part will be captured
-  /// without the splitting character(s), if `false`, the splitter will
-  /// be included with the part. [removeSplitters] must not be `null`.
-  ///
-  /// If [trimParts] is `true`, the parser will trim the whitespace around
-  /// each part when they are captured. [trimParts] must not be `null`.
-  ///
-  /// ```dart
-  ///   final String string = "1/ 2/ 3/ 4/ 5/ <6/ 7/ 8>/ 9/ 10";
-  ///
-  ///   final List<String> stringParts = StringSplitter.split(
-  ///     string,
-  ///     ['/'],
-  ///     delimiters: [['<', '>']],
-  ///     trimParts: true,
-  ///   );
-  ///
-  ///   print(stringParts); // [1, 2, 3, 4, 5, <6/ 7/ 8>, 9, 10]
-  /// ```
-  ///
-  /// [encoding] is the codec used to read the file.
+  /// {@macro string_splitter.StringSplitter.split.parameters}
   static List<String> splitSync(
     File file, {
     @required List<String> splitters,
@@ -143,42 +83,14 @@ class StringSplitterIo {
     ).convert(string);
   }
 
+  /// {@template string_splitter_io.StringSplitterIo.stream}
+  ///
   /// For parsing large files, [stream] streams the contents of [file]
   /// and returns the split parts in chunks.
   ///
-  /// Splits [string] into parts, slicing the string at each occurrence
-  /// of any of the [splitters]. [string] must not be `null`,
-  /// [splitters] must not be `null` or empty.
+  /// {@endtemplate}
   ///
-  ///  __Note:__ If using a linebreak (`\n`) as a splitter, it's a good idea to
-  /// include `\r\n` before `\n`, as Windows and various internet protocols
-  /// will automatically replace linebreaks with `\r\n` for backwards
-  /// compatibility with legacy platforms. Not doing so shouldn't cause any
-  /// problems in most use cases, but will leave strings with a hidden `\r`
-  /// character. `\n\r` is also used as a line ending by some systems.
-  ///
-  /// To exclude splitters from slicing, [delimiters] can be provided.
-  /// [delimiters] can be provided as a [String], in which case, that
-  /// [String] will be used as both the opening and closing delimiter.
-  /// Or, as a [List<String>] with 2 children, the first child being the
-  /// opening delimiter, and the second child being the closing delimiter.
-  /// [delimiters] must not be empty if it is provided.
-  ///
-  /// If [removeSplitters] is `true`, each string part will be captured
-  /// without the splitting character(s), if `false`, the splitter will
-  /// be included with the part. [removeSplitters] must not be `null`.
-  ///
-  /// If [trimParts] is `true`, the parser will trim the whitespace around
-  /// each part when they are captured. [trimParts] must not be `null`.
-  ///
-  /// [decoder] can be provided to decode [file]s bytes with an alternative
-  /// codec. If `null`, it defaults to `utf8.decoder` from the `dart:convert`
-  /// library.
-  ///
-  /// __Note:__ Due to being unable to detect which chunk is the last chunk
-  /// from [file], the final part from the last chunk will always be returned
-  /// independently in a list containing just the last part. This caveat
-  /// shouldn't affect performance in any way.
+  /// {@macro string_splitter.StringSplitter.stream.parameters}
   static Stream<List<String>> stream(
     File file, {
     @required List<String> splitters,

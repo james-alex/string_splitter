@@ -5,9 +5,15 @@ import './string_splitter_converter.dart';
 class StringSplitter {
   StringSplitter._();
 
+  /// {@template string_splitter.StringSplitter.split}
+  ///
   /// Splits [string] into parts, slicing the string at each occurrence
   /// of any of the [splitters]. [string] must not be `null`, [splitters]
   /// must not be `null` or empty.
+  ///
+  /// {@endtemplate}
+  ///
+  /// {@template string_splitter.StringSplitter.split.parameters}
   ///
   /// __Note:__ If using a linebreak (`\n`) as a splitter, it's a good idea to
   /// include `\r\n` before `\n`, as Windows and various internet protocols
@@ -29,6 +35,8 @@ class StringSplitter {
   ///
   /// If [trimParts] is `true`, the parser will trim the whitespace around
   /// each part when they are captured. [trimParts] must not be `null`.
+  ///
+  /// {@endtemplate}
   ///
   /// ```dart
   ///   final String string = "1/ 2/ 3/ 4/ 5/ <6/ 7/ 8>/ 9/ 10";
@@ -67,8 +75,14 @@ class StringSplitter {
     ).convert(string);
   }
 
+  /// {@template string_splitter.StringSplitter.stream}
+  ///
   /// For parsing long strings, [stream] splits [string] into chunks and
   /// streams the returned parts as each chunk is split.
+  ///
+  /// {@endtemplate}
+  ///
+  /// {@template string_splitter.StringSplitter.stream.parameters}
   ///
   /// Splits [string] into parts, slicing the string at each occurrence
   /// of any of the [splitters]. [string] must not be `null`,
@@ -97,6 +111,8 @@ class StringSplitter {
   ///
   /// [chunkSize] represents the number of characters in each chunk, it
   /// must not be `null` and must be `> 0`.
+  ///
+  /// {@endtemplate}
   static Stream<List<String>> stream(
     String string, {
     @required List<String> splitters,
@@ -131,11 +147,15 @@ class StringSplitter {
     );
   }
 
+  /// {@template string_splitter.StringSplitter.chunk}
+  ///
   /// Splits [string] into chunks, [chunkSize] characters in length.
   ///
   /// [string] must not be `null`.
   ///
   /// [chunkSize] must not be `null` and must be `> 0`.
+  ///
+  /// {@endtemplate}
   static List<String> chunk(String string, int chunkSize) {
     assert(string != null);
     assert(chunkSize != null && chunkSize > 0);
