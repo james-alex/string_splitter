@@ -4,18 +4,18 @@ import 'package:string_splitter/string_splitter_io.dart';
 
 void main() {
   test('Simple Split', () {
-    final string = "1/ 2/ 3/ 4/ 5/ \"6/ 7/ 8\"/ 9/ 10";
+    final string = '1/ 2/ 3/ 4/ 5/ \'6/ 7/ 8\'/ 9/ 10';
 
     final stringParts = StringSplitter.split(
-       string,
-       splitters: ['/'],
-       delimiters: ['"'],
-       trimParts: true,
-     );
+      string,
+      splitters: ['/'],
+      delimiters: ['\''],
+      trimParts: true,
+    );
 
     expect(stringParts.length, equals(8));
 
-    expect(stringParts[5], equals('"6/ 7/ 8"'));
+    expect(stringParts[5], equals('\'6/ 7/ 8\''));
   });
 
   // The tests below use modified version of timezonedb.com's database files.
@@ -57,7 +57,10 @@ void main() {
     final zone = StringSplitterIo.splitSync(
       File('test/files/zone.csv'),
       splitters: ['/', '\n'],
-      delimiters: ['"', ['<', '>']],
+      delimiters: [
+        '"',
+        Delimiter('<', '>'),
+      ],
       trimParts: true,
     );
 

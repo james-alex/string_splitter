@@ -1,19 +1,23 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
-import './helpers/code_units.dart' as code_units;
+import 'string_splitter.dart';
+import 'string_splitter_io.dart';
 
 /// A [Converter] for splitting strings and returning the parts in a list.
 class StringSplitterConverter extends Converter<String, List<String>> {
   /// A [Converter] for splitting strings and returning the parts in a list.
-  const StringSplitterConverter({
+  StringSplitterConverter({
     @required this.splitters,
     @required this.delimiters,
     @required this.removeSplitters,
     @required this.trimParts,
     this.chunkCount,
   })  : assert(splitters != null),
-        assert(delimiters != null),
+        assert(delimiters == null ||
+            delimiters.every(
+                (delimiter) => delimiter is String || delimiter is Delimiter)),
         assert(removeSplitters != null),
         assert(trimParts != null),
         assert(chunkCount == null || chunkCount > 0);
@@ -22,13 +26,9 @@ class StringSplitterConverter extends Converter<String, List<String>> {
   /// at each occurrence of a splitter.
   final List<String> splitters;
 
-  /// To exclude splitters from slicing a string, [delimiters] can be provided.
-  /// [delimiters] can be provided as a [String], in which case, that
-  /// [String] will be used as both the opening and closing delimiter.
-  /// Or, as a [List<String>] with 2 children, the first child being the
-  /// opening delimiter, and the second child being the closing delimiter.
-  /// [delimiters] must not be empty if it is provided.
-  final List<dynamic> delimiters;
+  /// [String]s and/or [Delimiter]s used to denote blocks of text that
+  /// shouldn't be parsed for [splitters].
+  final List<Object> delimiters;
 
   /// If [removeSplitters] is `true`, each string part will be captured
   /// without the splitting character(s), if `false`, the splitter will
@@ -45,7 +45,6 @@ class StringSplitterConverter extends Converter<String, List<String>> {
   @override
   List<String> convert(String string) {
     assert(string != null);
-
     return _StringSplitter.split(
       string,
       splitters: splitters,
@@ -58,10 +57,11 @@ class StringSplitterConverter extends Converter<String, List<String>> {
 
   @override
   Stream<List<String>> bind(Stream<String> stream) {
+    assert(stream != null);
     return Stream<List<String>>.eventTransformed(
       stream,
       (sink) => _StringSplitterEventSink(
-        eventSink: sink,
+        sink: sink,
         splitters: splitters,
         delimiters: delimiters,
         removeSplitters: removeSplitters,
@@ -72,52 +72,27 @@ class StringSplitterConverter extends Converter<String, List<String>> {
   }
 }
 
-class _StringSplitterEventSink extends _StringSplitterSink
+class _StringSplitterEventSink extends ChunkedConversionSink<String>
     implements EventSink<String> {
   _StringSplitterEventSink({
-    @required EventSink<List<String>> eventSink,
-    @required List<String> splitters,
-    @required List<dynamic> delimiters,
-    @required bool removeSplitters,
-    @required bool trimParts,
-    int chunkCount,
-  })  : _eventSink = eventSink,
-        super(
-          sink: eventSink,
-          splitters: splitters,
-          delimiters: delimiters,
-          removeSplitters: removeSplitters,
-          trimParts: trimParts,
-          chunkCount: chunkCount,
-        );
-
-  final EventSink<List<String>> _eventSink;
-
-  @override
-  void addError(Object o, [StackTrace stackTrace]) {
-    _eventSink.addError(o, stackTrace);
-  }
-}
-
-class _StringSplitterSink extends ChunkedConversionSink<String> {
-  _StringSplitterSink({
     @required this.sink,
     @required this.splitters,
     @required this.delimiters,
     @required this.removeSplitters,
     @required this.trimParts,
-    this.chunkCount,
+    @required this.chunkCount,
   })  : assert(splitters != null),
-        assert(delimiters != null),
+        assert(delimiters == null ||
+            delimiters.every(
+                (delimiter) => delimiter is String || delimiter is Delimiter)),
         assert(removeSplitters != null),
-        assert(trimParts != null),
-        assert(chunkCount == null || chunkCount > 0);
+        assert(trimParts != null);
 
   final Sink<List<String>> sink;
 
   final List<String> splitters;
 
-  final List<dynamic> delimiters;
+  final List<Object> delimiters;
 
   final bool removeSplitters;
 
@@ -125,9 +100,9 @@ class _StringSplitterSink extends ChunkedConversionSink<String> {
 
   final int chunkCount;
 
-  String _carryOver;
-
   int _chunkCount = 1;
+
+  String _carryOver;
 
   @override
   void add(String chunk) {
@@ -138,7 +113,7 @@ class _StringSplitterSink extends ChunkedConversionSink<String> {
       _carryOver = null;
     }
 
-    final isNotLast = chunkCount == null || _chunkCount < chunkCount;
+    final isLastChunk = chunkCount != null && _chunkCount >= chunkCount;
 
     // Split this chunk.
     final stringParts = _StringSplitter.split(
@@ -147,7 +122,7 @@ class _StringSplitterSink extends ChunkedConversionSink<String> {
       delimiters: delimiters,
       removeSplitters: removeSplitters,
       trimParts: trimParts,
-      carryOver: (isNotLast) ? true : false,
+      carryOver: !isLastChunk,
     );
 
     // Add the split chunk to the sink.
@@ -155,7 +130,7 @@ class _StringSplitterSink extends ChunkedConversionSink<String> {
 
     // Carry over the text remaining from this chunk,
     // if it's not the last chunk.
-    if (isNotLast) {
+    if (!isLastChunk) {
       _carryOver = stringParts.carryOver;
       _chunkCount++;
     } else {
@@ -173,6 +148,11 @@ class _StringSplitterSink extends ChunkedConversionSink<String> {
     }
 
     sink.close();
+  }
+
+  @override
+  void addError(Object o, [StackTrace stackTrace]) {
+    (sink as EventSink<List<String>>).addError(o, stackTrace);
   }
 }
 
@@ -192,19 +172,7 @@ class _StringSplitter {
   /// of any of the [splitters]. [string] must not be `null`,
   /// [splitters] must not be `null` or empty.
   ///
-  /// To exclude splitters from slicing, [delimiters] can be provided.
-  /// [delimiters] can be provided as a [String], in which case, that
-  /// [String] will be used as both the opening and closing delimiter.
-  /// Or, as a [List<String>] with 2 children, the first child being the
-  /// opening delimiter, and the second child being the closing delimiter.
-  /// [delimiters] must not be empty if it is provided.
-  ///
-  /// If [removeSplitters] is `true`, each string part will be captured
-  /// without the splitting character(s), if `false`, the splitter will
-  /// be included with the part. [removeSplitters] must not be `null`.
-  ///
-  /// If [trimParts] is `true`, the parser will trim the whitespace around
-  /// each part when they are captured. [trimParts] must not be `null`.
+  /// {@macro string_splitter.StringSplitter.split.parameters}
   ///
   /// If [carryOver] is `true`, text remaining at the end of [string] will
   /// be stored to be handled seperately from the split parts, if `false`,
@@ -212,42 +180,40 @@ class _StringSplitter {
   static _StringSplitter split(
     String string, {
     @required List<String> splitters,
-    @required List<dynamic> delimiters,
+    @required List<Object> delimiters,
     @required bool removeSplitters,
     @required bool trimParts,
     @required bool carryOver,
   }) {
     assert(string != null);
     assert(splitters != null && splitters.isNotEmpty);
-    assert(delimiters != null);
+    assert(delimiters == null ||
+        delimiters.every(
+            (delimiter) => delimiter is String || delimiter is Delimiter));
     assert(removeSplitters != null);
     assert(trimParts != null);
     assert(carryOver != null);
 
     final stringParts = <String>[];
 
-    final splitterCodeUnits = code_units.splitters(splitters);
-    final delimiterCodeUnits = code_units.delimiters(delimiters);
+    final splittersCodeUnits = splitters.map((splitter) => splitter.codeUnits);
 
     var delimited = false;
-
     var sliceStart = 0;
 
     for (var i = 0; i < string.length; i++) {
       // Check for delimiters.
       if (delimiters != null) {
-        for (List<dynamic> delimiters in delimiterCodeUnits) {
-          final List<int> delimiter = delimiters.first is List
-              ? delimited ? delimiters.last : delimiters.first
-              : delimiters;
-
+        for (var object in delimiters) {
+          final delimiter = (object is String
+                  ? object
+                  : delimited
+                      ? (object as Delimiter).closing
+                      : (object as Delimiter).opening)
+              .codeUnits;
           final sliceEnd = i + delimiter.length;
-
           if (sliceEnd < string.length &&
-              code_units.match(
-                delimiter,
-                string.substring(i, sliceEnd).codeUnits,
-              )) {
+              delimiter.equals(string.substring(i, sliceEnd).codeUnits)) {
             delimited = !delimited;
             i += delimiter.length - 1;
             break;
@@ -259,23 +225,18 @@ class _StringSplitter {
       if (delimited) continue;
 
       // Check for splitters.
-      for (var splitter in splitterCodeUnits) {
+      for (var splitter in splittersCodeUnits) {
         var sliceEnd = i + splitter.length;
 
         // If a splitter was found, capture the current slice.
         if (sliceEnd < string.length &&
-            code_units.match(
-              splitter,
-              string.substring(i, sliceEnd).codeUnits,
-            )) {
+            splitter.equals(string.substring(i, sliceEnd).codeUnits)) {
           if (removeSplitters) sliceEnd = i;
           var stringPart = string.substring(sliceStart, sliceEnd);
           if (trimParts) stringPart = stringPart.trim();
           stringParts.add(stringPart);
-
           sliceStart = removeSplitters ? i + splitter.length : sliceEnd;
           i = sliceStart - 1;
-
           break;
         }
       }
@@ -294,4 +255,16 @@ class _StringSplitter {
 
     return _StringSplitter(stringParts, remainder);
   }
+}
+
+/// {@template string_splitter.Delimiter}
+///
+/// An opening and optional closing delimiter utilized
+/// by [StringSplitter] and [StringSplitterIo].
+///
+/// {@endtemplate}
+class Delimiter {
+  /// {@macro string_splitter.Delimiter}
+  const Delimiter(this.opening, [this.closing]);
+  final String opening, closing;
 }

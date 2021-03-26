@@ -22,12 +22,8 @@ class StringSplitter {
   /// problems in most cases, but will leave strings with a hidden `\r`
   /// character. `\n\r` is also used as a line ending by some systems.
   ///
-  /// To exclude splitters from slicing, [delimiters] can be provided.
-  /// [delimiters] can be provided as a [String], in which case, that
-  /// [String] will be used as both the opening and closing delimiter.
-  /// Or, as a [List<String>] with 2 children, the first child being the
-  /// opening delimiter, and the second child being the closing delimiter.
-  /// [delimiters] must not be empty if it is provided.
+  /// [delimiters] can be provided as [String]s and/or [Delimiter]s to denote
+  /// blocks of text that shouldn't be parsed for [splitters].
   ///
   /// If [removeSplitters] is `true`, each string part will be captured
   /// without the splitting character(s), if `false`, the splitter will
@@ -40,17 +36,15 @@ class StringSplitter {
   static List<String> split(
     String string, {
     @required List<String> splitters,
-    List<dynamic> delimiters,
+    List<Object> delimiters,
     bool removeSplitters = true,
     bool trimParts = false,
   }) {
     assert(string != null);
     assert(splitters != null && splitters.isNotEmpty);
     assert(delimiters == null ||
-        (delimiters.isNotEmpty &&
-            delimiters.every((delimiter) =>
-                delimiter is String ||
-                (delimiter is List<String> && delimiter.length == 2))));
+        delimiters.every(
+            (delimiter) => delimiter is String || delimiter is Delimiter));
     assert(removeSplitters != null);
     assert(trimParts != null);
 
@@ -84,7 +78,7 @@ class StringSplitter {
   static Stream<List<String>> stream(
     String string, {
     @required List<String> splitters,
-    List<dynamic> delimiters,
+    List<Object> delimiters,
     bool removeSplitters = true,
     bool trimParts = false,
     @required int chunkSize,
@@ -92,16 +86,13 @@ class StringSplitter {
     assert(string != null);
     assert(splitters != null && splitters.isNotEmpty);
     assert(delimiters == null ||
-        (delimiters.isNotEmpty &&
-            delimiters.every((delimiter) =>
-                delimiter is String ||
-                (delimiter is List<String> && delimiter.length == 2))));
+        delimiters.every(
+            (delimiter) => delimiter is String || delimiter is Delimiter));
     assert(removeSplitters != null);
     assert(trimParts != null);
     assert(chunkSize != null && chunkSize > 0);
 
     final chunks = chunk(string, chunkSize);
-
     final input = Stream.fromIterable(chunks);
 
     return input.transform(
@@ -130,16 +121,14 @@ class StringSplitter {
 
     final chunkCount = (string.length / chunkSize).ceil();
 
-    final chunks = List<String>(chunkCount);
-
-    for (var i = 0; i < chunkCount; i++) {
-      final sliceStart = i * chunkSize;
+    final chunks = List<String>.generate(chunkCount, (index) {
+      final sliceStart = index * chunkSize;
       final sliceEnd = sliceStart + chunkSize;
-      chunks[i] = string.substring(
+      return string.substring(
         sliceStart,
         (sliceEnd < string.length) ? sliceEnd : string.length,
       );
-    }
+    });
 
     return chunks;
   }

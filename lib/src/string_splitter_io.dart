@@ -21,7 +21,7 @@ class StringSplitterIo {
   static Future<List<String>> split(
     File file, {
     @required List<String> splitters,
-    List<dynamic> delimiters,
+    List<Object> delimiters,
     bool removeSplitters = true,
     bool trimParts = false,
     Encoding encoding = utf8,
@@ -29,10 +29,8 @@ class StringSplitterIo {
     assert(file != null);
     assert(splitters != null && splitters.isNotEmpty);
     assert(delimiters == null ||
-        (delimiters.isNotEmpty &&
-            delimiters.every((delimiter) =>
-                delimiter is String ||
-                (delimiter is List<String> && delimiter.length == 2))));
+        delimiters.every(
+            (delimiter) => delimiter is String || delimiter is Delimiter));
     assert(removeSplitters != null);
     assert(trimParts != null);
 
@@ -58,7 +56,7 @@ class StringSplitterIo {
   static List<String> splitSync(
     File file, {
     @required List<String> splitters,
-    List<dynamic> delimiters,
+    List<Object> delimiters,
     bool removeSplitters = true,
     bool trimParts = false,
     Encoding encoding = utf8,
@@ -66,10 +64,8 @@ class StringSplitterIo {
     assert(file != null);
     assert(splitters != null && splitters.isNotEmpty);
     assert(delimiters == null ||
-        (delimiters.isNotEmpty &&
-            delimiters.every((delimiter) =>
-                delimiter is String ||
-                (delimiter is List<String> && delimiter.length == 2))));
+        delimiters.every(
+            (delimiter) => delimiter is String || delimiter is Delimiter));
     assert(removeSplitters != null);
     assert(trimParts != null);
 
@@ -96,7 +92,7 @@ class StringSplitterIo {
   static Stream<List<String>> stream(
     File file, {
     @required List<String> splitters,
-    List<dynamic> delimiters,
+    List<Object> delimiters,
     bool removeSplitters = true,
     bool trimParts = false,
     Converter<List<int>, String> decoder,
@@ -104,10 +100,8 @@ class StringSplitterIo {
     assert(file != null);
     assert(splitters != null && splitters.isNotEmpty);
     assert(delimiters == null ||
-        (delimiters.isNotEmpty &&
-            delimiters.every((delimiter) =>
-                delimiter is String ||
-                (delimiter is List<String> && delimiter.length == 2))));
+        delimiters.every(
+            (delimiter) => delimiter is String || delimiter is Delimiter));
     assert(removeSplitters != null);
     assert(trimParts != null);
 
