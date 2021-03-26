@@ -1,4 +1,3 @@
-import 'package:meta/meta.dart';
 import 'string_splitter_converter.dart';
 
 /// A utility class with methods for splitting strings.
@@ -35,18 +34,15 @@ class StringSplitter {
   /// {@endtemplate}
   static List<String> split(
     String string, {
-    @required List<String> splitters,
-    List<Object> delimiters,
+    required List<String> splitters,
+    List<Object>? delimiters,
     bool removeSplitters = true,
     bool trimParts = false,
   }) {
-    assert(string != null);
-    assert(splitters != null && splitters.isNotEmpty);
+    assert(splitters.isNotEmpty);
     assert(delimiters == null ||
         delimiters.every(
             (delimiter) => delimiter is String || delimiter is Delimiter));
-    assert(removeSplitters != null);
-    assert(trimParts != null);
 
     return StringSplitterConverter(
       splitters: splitters,
@@ -77,20 +73,17 @@ class StringSplitter {
   /// {@endtemplate}
   static Stream<List<String>> stream(
     String string, {
-    @required List<String> splitters,
-    List<Object> delimiters,
+    required List<String> splitters,
+    List<Object>? delimiters,
     bool removeSplitters = true,
     bool trimParts = false,
-    @required int chunkSize,
+    required int chunkSize,
   }) {
-    assert(string != null);
-    assert(splitters != null && splitters.isNotEmpty);
+    assert(splitters.isNotEmpty);
     assert(delimiters == null ||
         delimiters.every(
             (delimiter) => delimiter is String || delimiter is Delimiter));
-    assert(removeSplitters != null);
-    assert(trimParts != null);
-    assert(chunkSize != null && chunkSize > 0);
+    assert(chunkSize > 0);
 
     final chunks = chunk(string, chunkSize);
     final input = Stream.fromIterable(chunks);
@@ -116,8 +109,7 @@ class StringSplitter {
   ///
   /// {@endtemplate}
   static List<String> chunk(String string, int chunkSize) {
-    assert(string != null);
-    assert(chunkSize != null && chunkSize > 0);
+    assert(chunkSize > 0);
 
     final chunkCount = (string.length / chunkSize).ceil();
 
@@ -139,17 +131,15 @@ extension StringSplitterExtension on String {
   ///
   /// {@macro string_splitter.StringSplitter.split.parameters}
   List<String> split({
-    @required List<String> splitters,
-    List<Object> delimiters,
+    required List<String> splitters,
+    List<Object>? delimiters,
     bool removeSplitters = true,
     bool trimParts = false,
   }) {
-    assert(splitters != null && splitters.isNotEmpty);
+    assert(splitters.isNotEmpty);
     assert(delimiters == null ||
         delimiters.every(
             (delimiter) => delimiter is String || delimiter is Delimiter));
-    assert(removeSplitters != null);
-    assert(trimParts != null);
     return StringSplitter.split(
       this,
       splitters: splitters,
@@ -165,19 +155,17 @@ extension StringSplitterExtension on String {
   ///
   /// {@macro string_splitter.StringSplitter.stream.parameters}
   Stream<List<String>> splitStream({
-    @required List<String> splitters,
-    List<Object> delimiters,
+    required List<String> splitters,
+    List<Object>? delimiters,
     bool removeSplitters = true,
     bool trimParts = false,
-    @required int chunkSize,
+    required int chunkSize,
   }) {
-    assert(splitters != null && splitters.isNotEmpty);
+    assert(splitters.isNotEmpty);
     assert(delimiters == null ||
         delimiters.every(
             (delimiter) => delimiter is String || delimiter is Delimiter));
-    assert(removeSplitters != null);
-    assert(trimParts != null);
-    assert(chunkSize != null && chunkSize > 0);
+    assert(chunkSize > 0);
     return StringSplitter.stream(
       this,
       splitters: splitters,
@@ -190,7 +178,7 @@ extension StringSplitterExtension on String {
 
   /// {@macro string_splitter.StringSplitter.chunk}
   List<String> chunk(int chunkSize) {
-    assert(chunkSize != null && chunkSize > 0);
+    assert(chunkSize > 0);
     return StringSplitter.chunk(this, chunkSize);
   }
 }

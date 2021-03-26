@@ -6,11 +6,10 @@ version: 0.2.0+1
 homepage: https://github.com/james-alex/string_splitter
 
 environment:
-  sdk: ">=2.7.0 <3.0.0"
+  sdk: ">=2.12.0 <3.0.0"
 
 dependencies:
   collection: ^1.15.0
-  meta: ^1.1.8
 
 dev_dependencies:
   test: ^1.16.8
