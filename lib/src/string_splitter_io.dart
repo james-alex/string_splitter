@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io' show File;
 import 'package:meta/meta.dart';
-import './string_splitter_converter.dart';
+import 'string_splitter_converter.dart';
 
 export 'dart:io' show File;
 
@@ -89,6 +89,8 @@ class StringSplitterIo {
   /// and returns the split parts in chunks.
   ///
   /// {@endtemplate}
+  ///
+  /// {@macro string_splitter.StringSplitter.split.parameters}
   ///
   /// {@macro string_splitter.StringSplitter.stream.parameters}
   static Stream<List<String>> stream(
