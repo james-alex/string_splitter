@@ -1,138 +1,206 @@
 # string_splitter
 
-[![pub package](https://img.shields.io/pub/v/string_splitter.svg)](https://pub.dartlang.org/packages/string_splitter)
-[![style: effective dart](https://img.shields.io/badge/style-effective_dart-40c4ff.svg)](https://github.com/tenhobi/effective_dart)
-
 Utility classes for splitting strings and files into parts. Supports
 streamed parsing for handling long strings and large files.
 
 # Usage
 
-string_splitter has 2 libraries, [string_splitter] for parsing strings, and
+string_splitter has 2 libraries: [string_splitter] for parsing strings, and
 [string_splitter_io] for parsing files.
 
-## Parsing Strings
+## string_splitter
 
 ```dart
 import 'package:string_splitter/string_splitter.dart';
 ```
 
-[StringSplitter] contains 3 static methods: [split], [stream], and [chunk].
+[StringSplitter] is a utility class with 3 methods: [split], [stream],
+and [chunk].
 
-Each method accepts a [String] to split, and [split] and [stream] accept lists
-of [splitters] and [delimiters] to be used to split the string, while [chunk]
-splits strings into a set numbers of characters per chunk.
+[split] and [stream] accept [splitters], which defines the character(s)
+to split the strings at, and [delimiters], which can be provided as a list
+of [String]s and/or [Delimiter]s, to denote blocks of text which shouldn't
+be parsed for [splitters].
 
-[delimiters], if provided, will instruct the parser to ignore [splitters]
-contained within the delimiting characters. [delimiters] can be provided as
-an individual string, in which case the same character(s) will be used as both
-the opening and closing delimiters, or as a [List] containing 2 [String]s,
-the first string will be used as the opening delimiter, and the second, the
-closing delimiter.
+### split
 
-```dart
-// Delimiters must be a [String] or a [List<String>] with 2 children.
-List<dynamic> delimiters = ['"', ['<', '>']];
-```
+[split] synchronously splits the provided string at the provided[splitters]
+and returns a `List<String>` containing the split parts.
 
-[split] and [stream] have 2 other options, [removeSplitters] and [trimParts].
-[removeSplitters], if `true`, will instruct the parser not to include the
-splitting characters in the returned parts, and [trimParts], if `true`, will trim the whitespace around each captured part.
-
-[stream] and [chunk] both have a required parameter, [chunkSize], to set the
-number of characters to split each chunk into.
+__Note:__ [trimParts] can be set to `true` to trim the whitespace around the
+returned parts.
 
 ```dart
-/// Splits [string] into parts, slicing the string at each occurrence
-/// of any of the [splitters].
-static List<String> split(
-  String string, {
-  @required List<String> splitters,
-  List<dynamic> delimiters,
-  bool removeSplitters = true,
-  bool trimParts = false,
-});
+final string = '1, 2, 3, 4, 5, <6, 7, 8>, 9, 10';
 
-/// For parsing long strings, [stream] splits [string] into chunks and
-/// streams the returned parts as each chunk is split.
-static Stream<List<String>> stream(
-  String string, {
-  @required List<String> splitters,
-  List<dynamic> delimiters,
-  bool removeSplitters = true,
-  bool trimParts = false,
-  @required int chunkSize,
-});
-
-/// Splits [string] into chunks, [chunkSize] characters in length.
-static List<String> chunk(String string, int chunkSize);
-```
-
-Streams return each set of parts in chunks, to capture the complete data set,
-you'll have to add them into a combined list as they're parsed.
-
-```dart
-Stream<List<String>> stream = StringSplitter.stream(
+final stringParts = StringSplitter.split(
   string,
   splitters: [','],
-  delimiters: ['"'],
-  chunkSize: 5000,
+  delimiters: [Delimiter('<', '>')],
+  trimParts: true,
 );
 
-final List<String> parts = List<String>();
+print(stringParts); // ['1', '2', '3', '4', '5', '<6, 7, 8>', '9', '10']
+```
 
-await for (List<String> chunk in stream) {
-  parts.addAll(chunk);
+[split] can alternatively be used as an extension method on [String].
+
+```dart
+final string = '1, 2, 3, 4, 5, <6, 7, 8>, 9, 10';
+
+final stringParts = string.split(
+  splitters: [','],
+  delimiters: [Delimiter('<', '>')],
+  trimParts: true,
+);
+
+print(stringParts); // ['1', '2', '3', '4', '5', '<6, 7, 8>', '9', '10']
+```
+
+### stream
+
+[stream] is intended for handling long strings; it splits the provided string
+into chunks, streaming the resulting `List<String>`s as each chunk is parsed.
+
+[chunkSize] must be provided, which defines the number of characters to limit
+each chunk to.
+
+```dart
+final stream = StringSplitter.stream(
+  string,
+  chunkSize: 1000,
+  splitters: [','],
+  delimiters: [r'\'],
+);
+
+await for (List<String> parts in stream) {
+  print(parts);
 }
 ```
 
-## Parsing Files
+[stream] can alternatively be used as an extension method on [String],
+referenced as [splitStream].
+
+```dart
+final stream = string.splitStream(
+  chunkSize: 1000,
+  splitters: [','],
+  delimiters: [r'\'],
+);
+
+await for (List<String> parts in stream) {
+  print(parts);
+}
+```
+
+### chunk
+
+[chunk] splits strings into chunks of a defined length, returned as a `List<String>`.
+
+```dart
+final chunks = StringSplitter.chunk(string, 1000);
+```
+
+[chunk] can alternatively be used as an extension method on [String].
+
+```dart
+final chunks = string.chunk(1000);
+```
+
+## string_splitter_io
 
 ```dart
 import 'package:string_splitter/string_splitter_io.dart';
 ```
 
-[StringSplitterIo] also contains 3 static methods: [split], [splitSync],
-and [stream].
+[StringSplitterIo] is a utility class with 3 methods: [split], [splitSync],
+and [stream]; they function the same as [StringSplitter]'s methods, except
+they accept [File]s instead of [String]s.
 
-Rather than a [String] like [StringSplitter]'s methods, [StringSplitterIo]'s
-accept a [File], the contents of which will be read and parsed.
+### split
 
-In addition to the parameters described in the section above, each method also
-has a parameter to set the file's encoding, or in stream's case the decoder
-itself, which all default to `UTF8`.
+[split] asynchronously reads the provided [File] as a string and splits it apart
+at the provided [splitters] and returns a `Future<List<String>>` containing the
+split parts when the it completes.
 
 ```dart
-/// Reads [file] as a string and splits it into parts, slicing the string
-/// at each occurrence of any of the [splitters].
-static Future<List<String>> split(
-  File file, {
-  @required List<String> splitters,
-  List<dynamic> delimiters,
-  bool removeSplitters = true,
-  bool trimParts = false,
-  Encoding encoding = utf8,
-});
+final file = File('path/to/file');
+final stringParts = await StringSplitterIo.split(
+  file,
+  splitters: [','],
+  delimiters: [Delimiter('<', '>')],
+  trimParts: true,
+);
+```
 
-/// Synchronously reads [file] as a string and splits it into parts,
-/// slicing the string at each occurrence of any of the [splitters].
-static List<String> splitSync(
-  File file, {
-  @required List<String> splitters,
-  List<dynamic> delimiters,
-  bool removeSplitters = true,
-  bool trimParts = false,
-  Encoding encoding = utf8,
-});
+[split] can alternatively be used as an extension method on [File].
 
-/// For parsing large files, [stream] streams the contents of [file]
-/// and returns the split parts in chunks.
-static Stream<List<String>> stream(
-  File file, {
-  @required List<String> splitters,
-  List<dynamic> delimiters,
-  bool removeSplitters = true,
-  bool trimParts = false,
-  Converter<List<int>, String> decoder,
-});
+```dart
+final file = File('path/to/file');
+final stringParts = await file.split(
+  splitters: [','],
+  delimiters: [Delimiter('<', '>')],
+  trimParts: true,
+);
+```
+
+### splitSync
+
+[splitSync] synchronously reads the provided [File] as a string and splits it
+apart, returning a `List<String>` containing the split parts.
+
+```dart
+final file = File('path/to/file');
+final stringParts = StringSplitterIo.splitSync(
+  file,
+  splitters: [','],
+  delimiters: [Delimiter('<', '>')],
+  trimParts: true,
+);
+```
+
+[splitSync] can alternatively be used as an extension method on [File].
+
+```dart
+final file = File('path/to/file');
+final stringParts = file.splitSync(
+  splitters: [','],
+  delimiters: [Delimiter('<', '>')],
+  trimParts: true,
+);
+```
+
+### stream
+
+[stream] is intended for splitting large files; it streams the contents of the
+provided [File], splitting and returning the parsed chunks as they're read.
+
+```dart
+final file = File('path/to/file');
+final stream = StringSplitterIo.stream(
+  file,
+  chunkSize: 1000,
+  splitters: [','],
+  delimiters: [r'\'],
+);
+
+await for (List<String> parts in stream) {
+  print(parts);
+}
+```
+
+[stream] can alternatively be used as an extension method on [File],
+referenced as [splitStream].
+
+```dart
+final file = File('path/to/file');
+final stream = file.splitStream(
+  chunkSize: 1000,
+  splitters: [','],
+  delimiters: [r'\'],
+);
+
+await for (List<String> parts in stream) {
+  print(parts);
+}
 ```
